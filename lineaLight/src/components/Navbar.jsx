@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
+import { motion as Motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
 import './Navbar.css'
 
 const links = ['Home', 'About Us', 'Contact', 'Products']
@@ -22,7 +22,7 @@ function MagneticLink({ children, href, onClick }) {
   const reset = () => { x.set(0); y.set(0); setHovered(false) }
 
   return (
-    <motion.a
+    <Motion.a
       ref={ref}
       href={href}
       onClick={onClick}
@@ -34,7 +34,7 @@ function MagneticLink({ children, href, onClick }) {
     >
       <span className="mag-link-chars">
         {children.split('').map((char, i) => (
-          <motion.span
+          <Motion.span
             key={i}
             className="mag-link-char"
             initial={false}
@@ -48,11 +48,11 @@ function MagneticLink({ children, href, onClick }) {
             }}
           >
             {char}
-          </motion.span>
+          </Motion.span>
         ))}
       </span>
 
-      <motion.span
+      <Motion.span
         className="mag-link-underline"
         style={{ originX: 0.5 }}
         initial={false}
@@ -67,7 +67,7 @@ function MagneticLink({ children, href, onClick }) {
         transition={{ duration: 0.5, ease: smooth }}
       />
 
-      <motion.span
+      <Motion.span
         className="mag-link-halo"
         initial={false}
         animate={{
@@ -77,7 +77,7 @@ function MagneticLink({ children, href, onClick }) {
         }}
         transition={{ duration: 0.6, ease: smooth }}
       />
-    </motion.a>
+    </Motion.a>
   )
 }
 
@@ -101,7 +101,7 @@ export default function Navbar() {
   }, [])
 
   return (
-    <motion.nav
+    <Motion.nav
       className="navbar"
       initial={{ y: -100, opacity: 0 }}
       animate={{
@@ -117,7 +117,7 @@ export default function Navbar() {
     >
       <div className={`navbar-inner${scrolled ? ' scrolled' : ''}`}>
 
-        <motion.a
+        <Motion.a
           href="#"
           className="navbar-logo"
           initial={{ opacity: 0, x: -20 }}
@@ -127,16 +127,16 @@ export default function Navbar() {
           whileTap={{ scale: 0.97 }}
         >
           <span>LOREM<span className="navbar-logo-dim">IPSUM</span></span>
-          <motion.span
+          <Motion.span
             className="navbar-logo-glow"
             whileHover={{ opacity: 0.08 }}
             initial={{ opacity: 0 }}
           />
-        </motion.a>
+        </Motion.a>
 
         <ul className="navbar-links">
           {links.map((link, i) => (
-            <motion.li
+            <Motion.li
               key={link}
               initial={{ opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -145,11 +145,11 @@ export default function Navbar() {
               <MagneticLink href={`#${link.toLowerCase()}`}>
                 {link}
               </MagneticLink>
-            </motion.li>
+            </Motion.li>
           ))}
         </ul>
 
-        <motion.button
+        <Motion.button
           className="navbar-hamburger"
           aria-label="Menu"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -157,28 +157,28 @@ export default function Navbar() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 1.1, ease: smooth }}
         >
-          <motion.span
+          <Motion.span
             className="navbar-hamburger-line"
             animate={menuOpen ? { rotate: 45, y: 4, width: 18 } : { rotate: 0, y: 0, width: 20 }}
             transition={{ duration: 0.4, ease: smooth }}
           />
-          <motion.span
+          <Motion.span
             className="navbar-hamburger-line"
             style={{ width: 12 }}
             animate={menuOpen ? { opacity: 0, x: 8 } : { opacity: 1, x: 0 }}
             transition={{ duration: 0.3, ease: smooth }}
           />
-          <motion.span
+          <Motion.span
             className="navbar-hamburger-line"
             animate={menuOpen ? { rotate: -45, y: -4, width: 18 } : { rotate: 0, y: 0, width: 20 }}
             transition={{ duration: 0.4, ease: smooth }}
           />
-        </motion.button>
+        </Motion.button>
       </div>
 
       <AnimatePresence>
         {menuOpen && (
-          <motion.div
+          <Motion.div
             className="navbar-mobile-menu"
             initial={{ opacity: 0, y: -12, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -187,7 +187,7 @@ export default function Navbar() {
           >
             <ul>
               {links.map((link, i) => (
-                <motion.li
+                <Motion.li
                   key={link}
                   initial={{ opacity: 0, x: -14 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -200,12 +200,12 @@ export default function Navbar() {
                   >
                     {link}
                   </a>
-                </motion.li>
+                </Motion.li>
               ))}
             </ul>
-          </motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
-    </motion.nav>
+    </Motion.nav>
   )
 }

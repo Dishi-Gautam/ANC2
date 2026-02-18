@@ -1,7 +1,7 @@
 import { useEffect, useRef, useContext } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { PreviewContext } from './ImagePreview'
+import { PreviewContext } from './PreviewContext'
 import './SwipeSection.css'
 import pic1 from '../assets/pic1.jpg'
 import pic2 from '../assets/pic2.jpg'

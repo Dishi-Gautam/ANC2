@@ -1,7 +1,7 @@
 import { useEffect, useRef, useContext } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { PreviewContext } from './ImagePreview'
+import { PreviewContext } from './PreviewContext'
 import './ServicesSection.css'
 import pic1 from '../assets/pic1.jpg'
 import pic2 from '../assets/pic2.jpg'
@@ -37,7 +37,7 @@ function ServicesSection() {
   useEffect(() => {
     const serviceCards = sectionRef.current.querySelectorAll('.service-card')
     
-    serviceCards.forEach((card, index) => {
+    serviceCards.forEach((card) => {
       const imageWrapper = card.querySelector('.service-image')
       const content = card.querySelector('.service-content')
       

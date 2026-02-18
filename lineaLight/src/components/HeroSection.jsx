@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react'
-import { motion } from 'framer-motion'
+import { motion as Motion } from 'framer-motion'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './HeroSection.css'
@@ -224,7 +224,7 @@ export default function HeroSection() {
 			<RadiatingLines />
 			<ParticleCanvas />
 
-			<motion.h1
+			<Motion.h1
 				className="hero-title"
 				initial={{ opacity: 0, y: 30 }}
 				animate={{ opacity: 1, y: 0 }}
@@ -233,9 +233,9 @@ export default function HeroSection() {
 				Contemporary lighting
 				<br />
 				solutions crafted for you
-			</motion.h1>
+			</Motion.h1>
 
-			<motion.p
+			<Motion.p
 				className="hero-sub"
 				initial={{ opacity: 0, y: 18 }}
 				animate={{ opacity: 1, y: 0 }}
@@ -244,9 +244,9 @@ export default function HeroSection() {
 				Innovative indoor &amp; outdoor lighting designed with precision,
 				<br className="hero-br-desktop" />
 				engineered for modern architectural spaces.
-			</motion.p>
+			</Motion.p>
 
-			<motion.div
+			<Motion.div
 				className="hero-ctas"
 				initial={{ opacity: 0, y: 16 }}
 				animate={{ opacity: 1, y: 0 }}
@@ -258,9 +258,9 @@ export default function HeroSection() {
 				<a href="#products" className="hero-btn hero-btn-secondary">
 					Explore products <span className="hero-btn-arrow">&rarr;</span>
 				</a>
-			</motion.div>
+			</Motion.div>
 
-			<motion.div
+			<Motion.div
 				className="hero-trust"
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
@@ -271,7 +271,7 @@ export default function HeroSection() {
 						<IconCheck /> {f}
 					</span>
 				))}
-			</motion.div>
+			</Motion.div>
 
 			<div className="hero-cards-fan" ref={cardsRef}>
 				{imageCards.map(({ image, label }, i) => (

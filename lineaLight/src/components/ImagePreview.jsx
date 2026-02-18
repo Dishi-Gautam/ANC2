@@ -1,10 +1,7 @@
-import { createContext, useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect, useCallback } from 'react'
+import { motion as Motion, AnimatePresence } from 'framer-motion'
 import './ImagePreview.css'
-
-export const PreviewContext = createContext({
-  openPreview: () => {},
-})
+import { PreviewContext } from './PreviewContext'
 
 const DOCK_BOUNCE = {
   type: 'spring',
@@ -48,7 +45,7 @@ export function ImagePreviewProvider({ children }) {
       <AnimatePresence>
         {preview && (
           <>
-            <motion.div
+            <Motion.div
               className="img-preview-backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -57,7 +54,7 @@ export function ImagePreviewProvider({ children }) {
               onClick={closePreview}
             />
 
-            <motion.div
+            <Motion.div
               className="img-preview-container"
               onClick={closePreview}
               initial={{ opacity: 0, scale: 0.25, y: 80 }}
@@ -69,7 +66,7 @@ export function ImagePreviewProvider({ children }) {
                 opacity: { duration: 0.2 },
               }}
             >
-              <motion.button
+              <Motion.button
                 className="img-preview-close"
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -82,9 +79,9 @@ export function ImagePreviewProvider({ children }) {
                      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
-              </motion.button>
+              </Motion.button>
 
-              <motion.img
+              <Motion.img
                 src={preview.src}
                 alt={preview.label || 'Preview'}
                 className="img-preview-image"
@@ -97,7 +94,7 @@ export function ImagePreviewProvider({ children }) {
               />
 
               {preview.label && (
-                <motion.div
+                <Motion.div
                   className="img-preview-label-wrap"
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -105,9 +102,9 @@ export function ImagePreviewProvider({ children }) {
                   transition={{ delay: 0.12, duration: 0.35 }}
                 >
                   <span className="img-preview-label">{preview.label}</span>
-                </motion.div>
+                </Motion.div>
               )}
-            </motion.div>
+            </Motion.div>
           </>
         )}
       </AnimatePresence>
