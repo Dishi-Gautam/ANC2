@@ -1,7 +1,0 @@
-export { default as Navbar } from './Navbar'
-export { default as HeroSection } from './HeroSection'
-export { default as MainGrid } from './MainGrid'
-export { default as SwipeSection } from './SwipeSection'
-export { default as ServicesSection } from './ServicesSection'
-export { default as Footer } from './Footer'
-export { ImagePreviewProvider } from './ImagePreview'

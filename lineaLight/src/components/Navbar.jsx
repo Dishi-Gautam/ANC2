@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion as Motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
-import './Navbar.css'
 
 const links = ['Home', 'About Us', 'Contact', 'Products']
 const smooth = [0.22, 1, 0.36, 1]
@@ -30,13 +29,13 @@ function MagneticLink({ children, href, onClick }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={reset}
       style={{ x: springX, y: springY }}
-      className="mag-link"
+      className="relative block cursor-pointer select-none px-1 py-2 no-underline"
     >
-      <span className="mag-link-chars">
+      <span className="flex overflow-hidden">
         {children.split('').map((char, i) => (
           <Motion.span
             key={i}
-            className="mag-link-char"
+            className="inline-block text-sm font-medium tracking-[0.05em]"
             initial={false}
             animate={{
               y: hovered ? -1 : 0,
@@ -53,7 +52,7 @@ function MagneticLink({ children, href, onClick }) {
       </span>
 
       <Motion.span
-        className="mag-link-underline"
+        className="pointer-events-none absolute bottom-0 left-1/2 h-[1.5px] rounded-full bg-white"
         style={{ originX: 0.5 }}
         initial={false}
         animate={{
@@ -68,7 +67,7 @@ function MagneticLink({ children, href, onClick }) {
       />
 
       <Motion.span
-        className="mag-link-halo"
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-radial-[at_center] from-white to-transparent"
         initial={false}
         animate={{
           width: hovered ? 60 : 0,
@@ -102,7 +101,7 @@ export default function Navbar() {
 
   return (
     <Motion.nav
-      className="navbar"
+      className="fixed left-0 right-0 top-0 z-[100] px-4 py-3 sm:px-6"
       initial={{ y: -100, opacity: 0 }}
       animate={{
         y: visible ? 0 : -110,
@@ -115,26 +114,35 @@ export default function Navbar() {
         filter: { duration: 0.6, ease: 'easeOut' },
       }}
     >
-      <div className={`navbar-inner${scrolled ? ' scrolled' : ''}`}>
+      <div
+        className={`z-[100] mx-auto flex w-full max-w-7xl items-center justify-between rounded-2xl border px-6 py-4 transition-all duration-700 sm:px-10 ${
+          scrolled
+            ? 'border-white/10 bg-black/50 shadow-[0_10px_40px_rgba(0,0,0,0.6)] backdrop-blur-2xl'
+            : 'border-white/5 bg-black/25 shadow-[0_6px_24px_rgba(8,10,15,0.45)] backdrop-blur-xl'
+        }`}
+      >
 
         <Motion.a
           href="#"
-          className="navbar-logo"
+          className="relative select-none text-lg font-bold tracking-[-0.025em] text-white no-underline sm:text-xl"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.9, delay: 0.4, ease: smooth }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.97 }}
         >
-          <span>LOREM<span className="navbar-logo-dim">IPSUM</span></span>
+          <span>
+            LOREM
+            <span className="font-light opacity-50">IPSUM</span>
+          </span>
           <Motion.span
-            className="navbar-logo-glow"
+            className="pointer-events-none absolute inset-0 rounded-lg bg-radial-[circle_at_center] from-white to-transparent"
             whileHover={{ opacity: 0.08 }}
             initial={{ opacity: 0 }}
           />
         </Motion.a>
 
-        <ul className="navbar-links">
+        <ul className="hidden list-none items-center gap-8 md:flex">
           {links.map((link, i) => (
             <Motion.li
               key={link}
@@ -150,7 +158,7 @@ export default function Navbar() {
         </ul>
 
         <Motion.button
-          className="navbar-hamburger"
+          className="relative flex cursor-pointer flex-col gap-1.5 border-none bg-transparent p-2 md:hidden"
           aria-label="Menu"
           onClick={() => setMenuOpen(!menuOpen)}
           initial={{ opacity: 0, scale: 0.6 }}
@@ -158,18 +166,18 @@ export default function Navbar() {
           transition={{ duration: 0.8, delay: 1.1, ease: smooth }}
         >
           <Motion.span
-            className="navbar-hamburger-line"
+            className="block h-[1.5px] origin-center bg-white/70"
             animate={menuOpen ? { rotate: 45, y: 4, width: 18 } : { rotate: 0, y: 0, width: 20 }}
             transition={{ duration: 0.4, ease: smooth }}
           />
           <Motion.span
-            className="navbar-hamburger-line"
+            className="block h-[1.5px] origin-center bg-white/70"
             style={{ width: 12 }}
             animate={menuOpen ? { opacity: 0, x: 8 } : { opacity: 1, x: 0 }}
             transition={{ duration: 0.3, ease: smooth }}
           />
           <Motion.span
-            className="navbar-hamburger-line"
+            className="block h-[1.5px] origin-center bg-white/70"
             animate={menuOpen ? { rotate: -45, y: -4, width: 18 } : { rotate: 0, y: 0, width: 20 }}
             transition={{ duration: 0.4, ease: smooth }}
           />
@@ -179,13 +187,13 @@ export default function Navbar() {
       <AnimatePresence>
         {menuOpen && (
           <Motion.div
-            className="navbar-mobile-menu"
+            className="mx-auto mt-2 w-full max-w-7xl rounded-2xl border border-white/10 bg-black/80 p-5 backdrop-blur-2xl md:hidden"
             initial={{ opacity: 0, y: -12, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -12, scale: 0.97 }}
             transition={{ duration: 0.5, ease: smooth }}
           >
-            <ul>
+            <ul className="flex list-none flex-col gap-1">
               {links.map((link, i) => (
                 <Motion.li
                   key={link}
@@ -195,7 +203,7 @@ export default function Navbar() {
                 >
                   <a
                     href={`#${link.toLowerCase()}`}
-                    className="navbar-mobile-link"
+                    className="block border-b border-white/5 py-2.5 text-sm font-medium tracking-[0.05em] text-white/60 no-underline transition-colors duration-300 hover:text-white"
                     onClick={() => setMenuOpen(false)}
                   >
                     {link}

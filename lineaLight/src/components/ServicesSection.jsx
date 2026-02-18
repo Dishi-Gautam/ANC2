@@ -2,7 +2,6 @@ import { useEffect, useRef, useContext } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { PreviewContext } from './PreviewContext'
-import './ServicesSection.css'
 import pic1 from '../assets/pic1.jpg'
 import pic2 from '../assets/pic2.jpg'
 import pic3 from '../assets/pic3.jpg'
@@ -94,23 +93,24 @@ function ServicesSection() {
   }, [])
 
   return (
-    <section className="services-section" ref={sectionRef}>
-      <h2>Our Services</h2>
-      <div className="services-grid">
+    <section className="bg-black px-4 py-14 sm:px-6 lg:px-10" ref={sectionRef}>
+      <h2 className="mb-8 text-center text-3xl font-medium text-white">Our Services</h2>
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         {services.map((service, index) => (
           <div 
             key={index} 
-            className="service-card"
+            className="service-card group relative min-h-[420px] cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-zinc-950"
             onClick={() => openPreview(service.image, service.title)}
           >
             <div 
-              className="service-image"
+              className="service-image absolute inset-0 bg-cover bg-center [transform:translateZ(0)]"
               style={{ backgroundImage: `url(${service.image})` }}
             />
-            <div className="service-content">
-              <span className="service-tag">{service.tag}</span>
-              <h3>{service.title}</h3>
-              <p>{service.description}</p>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/25 to-black/75" />
+            <div className="service-content relative z-[2] flex h-full flex-col justify-end p-7">
+              <span className="mb-2 text-xs uppercase tracking-[0.12em] text-white/70">{service.tag}</span>
+              <h3 className="mb-1 text-2xl font-semibold text-white">{service.title}</h3>
+              <p className="text-sm text-white/75">{service.description}</p>
             </div>
           </div>
         ))}

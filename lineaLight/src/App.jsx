@@ -1,12 +1,10 @@
-import {
-  Navbar,
-  HeroSection,
-  MainGrid,
-  SwipeSection,
-  ServicesSection,
-  Footer,
-  ImagePreviewProvider,
-} from './components'
+import Navbar from './components/Navbar'
+import HeroSection from './components/HeroSection'
+import MainGrid from './components/MainGrid'
+import SwipeSection from './components/SwipeSection'
+import ServicesSection from './components/ServicesSection'
+import Footer from './components/Footer'
+import { ImagePreviewProvider } from './components/ImagePreview'
 
 function App() {
   return (

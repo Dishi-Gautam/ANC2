@@ -2,7 +2,6 @@ import { useEffect, useRef, useContext } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { PreviewContext } from './PreviewContext'
-import './MainGrid.css'
 import pic1 from '../assets/pic1.jpg'
 import pic2 from '../assets/pic2.jpg'
 import pic3 from '../assets/pic3.jpg'
@@ -29,7 +28,14 @@ function MainGrid() {
 
     const onEnter = (e) => {
       const item = e.currentTarget
-      item.classList.add('is-hovering')
+      item.style.boxShadow = '0 20px 60px rgba(0, 0, 0, 0.5), 0 8px 20px rgba(0, 0, 0, 0.3)'
+      item.style.zIndex = '4'
+      const overlay = item.querySelector('.grid-overlay')
+      const shine = item.querySelector('.grid-shine')
+      const image = item.querySelector('.grid-image')
+      if (overlay) overlay.style.opacity = '0.6'
+      if (shine) shine.style.opacity = '1'
+      if (image) image.style.transform = 'scale(1.08) translateZ(0)'
     }
     const onMove = (e) => {
       const item = e.currentTarget
@@ -44,8 +50,15 @@ function MainGrid() {
     }
     const onLeave = (e) => {
       const item = e.currentTarget
-      item.classList.remove('is-hovering')
       item.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
+      item.style.boxShadow = ''
+      item.style.zIndex = ''
+      const overlay = item.querySelector('.grid-overlay')
+      const shine = item.querySelector('.grid-shine')
+      const image = item.querySelector('.grid-image')
+      if (overlay) overlay.style.opacity = '1'
+      if (shine) shine.style.opacity = '0'
+      if (image) image.style.transform = 'translateZ(0)'
     }
 
     items.forEach((item) => {
@@ -99,23 +112,23 @@ function MainGrid() {
   }, [])
 
   return (
-    <section className="main-grid" ref={gridRef}>
+    <section className="mt-20 grid grid-cols-1 bg-black py-1.5 md:grid-cols-2 xl:grid-cols-3" ref={gridRef}>
       {gridItems.map((item, index) => (
         <div
           key={index}
-          className="grid-item"
+          className="grid-item relative flex aspect-[4/3] cursor-pointer items-start justify-start overflow-hidden bg-[#111] p-5 [transform:perspective(800px)_rotateX(0deg)_rotateY(0deg)_scale3d(1,1,1)] [transform-style:preserve-3d] transition-[transform,box-shadow] duration-500 [transition-timing-function:cubic-bezier(0.23,1,0.32,1)] md:aspect-[16/9] md:p-6 xl:aspect-[16/10]"
           onClick={() => openPreview(item.image, item.label)}
         >
           <img
             src={item.image}
             alt={item.label}
-            className="grid-image"
+            className="grid-image pointer-events-none absolute inset-x-0 -inset-y-[10%] h-[120%] w-full object-cover object-center [transform:translateZ(0)] transition-transform duration-700 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)]"
             loading="lazy"
             draggable={false}
           />
-          <div className="grid-overlay" />
-          <div className="grid-shine" />
-          <span className="label">{item.label}</span>
+          <div className="grid-overlay pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/40 via-black/5 to-black/25 transition-opacity duration-300" />
+          <div className="grid-shine pointer-events-none absolute inset-0 z-[3] bg-[linear-gradient(125deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.06)_40%,rgba(255,255,255,0)_60%)] opacity-0 transition-opacity duration-300" />
+          <span className="label relative z-[2] text-xl font-medium text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.5)] md:text-[22px] xl:text-2xl">{item.label}</span>
         </div>
       ))}
     </section>
