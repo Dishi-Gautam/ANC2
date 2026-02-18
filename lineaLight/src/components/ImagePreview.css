@@ -1,0 +1,112 @@
+.img-preview-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+}
+
+.img-preview-container {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  cursor: pointer;
+  perspective: 800px;
+}
+
+.img-preview-image {
+  max-width: 88vw;
+  max-height: 78vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 14px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 40px 120px rgba(0, 0, 0, 0.4);
+  user-select: none;
+  cursor: default;
+}
+
+.img-preview-close {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.img-preview-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+}
+
+.img-preview-label-wrap {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.img-preview-label {
+  font-size: 22px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.02em;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+@media (max-width: 768px) {
+  .img-preview-container {
+    padding: 20px;
+  }
+
+  .img-preview-image {
+    max-width: 95vw;
+    max-height: 72vh;
+    border-radius: 10px;
+  }
+
+  .img-preview-close {
+    top: 14px;
+    right: 14px;
+    width: 38px;
+    height: 38px;
+  }
+
+  .img-preview-label {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .img-preview-label-wrap {
+    bottom: 20px;
+  }
+
+  .img-preview-label {
+    font-size: 16px;
+  }
+}
