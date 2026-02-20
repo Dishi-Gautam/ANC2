@@ -1,7 +1,6 @@
-import { useEffect, useRef, useContext } from 'react'
+import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { PreviewContext } from './PreviewContext'
 import pic1 from '../assets/pic1.jpg'
 import pic2 from '../assets/pic2.jpg'
 import pic3 from '../assets/pic3.jpg'
@@ -11,111 +10,167 @@ gsap.registerPlugin(ScrollTrigger)
 const services = [
   {
     tag: 'A 360° System',
-    title: 'Linealight Collection',
-    description: 'Light Up your Service, Easy!',
-    image: pic1
+    title: 'Linealight\nCollection',
+    description:
+      'Your complete lighting ecosystem designed for seamless integration across every architectural space.',
+    image: pic1,
   },
   {
     tag: 'Tailor-Made Solutions',
-    title: 'Custom Projects for Every Space',
-    description: 'One Project, One BeSpoke Light',
-    image: pic2
+    title: 'Custom Projects\nfor Every Space',
+    description:
+      'One Project, One Bespoke Light. Precision-crafted solutions tailored to your unique requirements.',
+    image: pic2,
   },
   {
     tag: 'Custom Finishes',
-    title: 'Finishes Catalogue',
-    description: 'Adapt every detail to your project',
-    image: pic3
-  }
+    title: 'Finishes\nCatalogue',
+    description:
+      'Adapt every detail to your project with our extensive range of custom finishes and premium materials.',
+    image: pic3,
+  },
+  {
+    tag: 'Smart Integration',
+    title: 'Intelligent\nLighting Control',
+    description:
+      'Seamlessly connect your lighting with modern smart-home and building-management systems for effortless control.',
+    image: pic1,
+  },
+  {
+    tag: 'Sustainable Design',
+    title: 'Energy Efficient\nSolutions',
+    description:
+      'Award-winning designs that reduce energy consumption while delivering exceptional illumination quality.',
+    image: pic2,
+  },
 ]
 
 function ServicesSection() {
-  const sectionRef = useRef(null)
-  const { openPreview } = useContext(PreviewContext)
+  const wrapperRef = useRef(null)
+  const pinRef = useRef(null)
 
   useEffect(() => {
-    const serviceCards = sectionRef.current.querySelectorAll('.service-card')
-    
-    serviceCards.forEach((card) => {
-      const imageWrapper = card.querySelector('.service-image')
-      const content = card.querySelector('.service-content')
-      
-      gsap.fromTo(card,
-        {
-          opacity: 0,
-          y: 80,
-          rotationY: -15,
-          scale: 0.9
+    const wrapper = wrapperRef.current
+    const pin = pinRef.current
+    if (!wrapper || !pin) return
+
+    const ctx = gsap.context(() => {
+      const textPanels = pin.querySelectorAll('.svc-text')
+      const imagePanels = pin.querySelectorAll('.svc-img')
+      const bars = pin.querySelectorAll('.svc-bar')
+      const count = services.length
+
+      /* ---------- initial state ---------- */
+      textPanels.forEach((p, i) => {
+        if (i > 0) gsap.set(p, { autoAlpha: 0, y: 40 })
+      })
+      imagePanels.forEach((p, i) => {
+        if (i > 0) gsap.set(p, { autoAlpha: 0, scale: 1.04 })
+      })
+      bars.forEach((b, i) => {
+        gsap.set(b, { scaleX: i === 0 ? 1 : 0, opacity: i === 0 ? 1 : 0.3 })
+      })
+
+      /* ---------- build timeline ---------- */
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: wrapper,
+          start: 'top top',
+          end: `+=${count * 100}vh`,
+          pin: pin,
+          scrub: 0.5,
+          anticipatePin: 1,
         },
-        {
-          opacity: 1,
-          y: 0,
-          rotationY: 0,
-          scale: 1,
-          duration: 1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: card,
-            start: 'top 80%',
-            end: 'top 30%',
-            toggleActions: 'play none none reverse'
-          }
-        }
-      )
-
-      gsap.to(imageWrapper, {
-        yPercent: -20,
-        scale: 1.1,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: card,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 2
-        }
       })
 
-      gsap.to(content, {
-        y: -30,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: card,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1
-        }
-      })
-    })
+      for (let i = 0; i < count - 1; i++) {
+        const pos = i
+        // fade-out current text + image
+        tl.to(textPanels[i], { autoAlpha: 0, y: -30, duration: 0.4, ease: 'power2.in' }, pos)
+        tl.to(imagePanels[i], { autoAlpha: 0, scale: 1.06, duration: 0.5, ease: 'power2.in' }, pos)
+        tl.to(bars[i], { scaleX: 0, opacity: 0.3, duration: 0.35 }, pos)
 
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
-    }
+        // fade-in next
+        tl.fromTo(
+          textPanels[i + 1],
+          { autoAlpha: 0, y: 40 },
+          { autoAlpha: 1, y: 0, duration: 0.45, ease: 'power3.out' },
+          pos + 0.3,
+        )
+        tl.fromTo(
+          imagePanels[i + 1],
+          { autoAlpha: 0, scale: 1.04 },
+          { autoAlpha: 1, scale: 1, duration: 0.55, ease: 'power3.out' },
+          pos + 0.3,
+        )
+        tl.to(bars[i + 1], { scaleX: 1, opacity: 1, duration: 0.45 }, pos + 0.3)
+      }
+    }, wrapper)
+
+    return () => ctx.revert()
   }, [])
 
   return (
-    <section className="bg-black px-4 py-14 sm:px-6 lg:px-10" ref={sectionRef}>
-      <h2 className="mb-8 text-center text-3xl font-medium text-white">Our Services</h2>
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        {services.map((service, index) => (
-          <div 
-            key={index} 
-            className="service-card group relative min-h-[420px] cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-zinc-950"
-            onClick={() => openPreview(service.image, service.title)}
-          >
-            <div 
-              className="service-image absolute inset-0 bg-cover bg-center [transform:translateZ(0)]"
-              style={{ backgroundImage: `url(${service.image})` }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/25 to-black/75" />
-            <div className="service-content relative z-[2] flex h-full flex-col justify-end p-7">
-              <span className="mb-2 text-xs uppercase tracking-[0.12em] text-white/70">{service.tag}</span>
-              <h3 className="mb-1 text-2xl font-semibold text-white">{service.title}</h3>
-              <p className="text-sm text-white/75">{service.description}</p>
+    <div ref={wrapperRef}>
+      <div
+        ref={pinRef}
+        className="relative flex h-screen w-full items-center overflow-hidden bg-[#0a0a0a]"
+      >
+        {/* ───── right: full-bleed image ───── */}
+        <div className="pointer-events-none absolute inset-0">
+          {services.map((s, i) => (
+            <div key={i} className="svc-img absolute inset-0">
+              <img
+                src={s.image}
+                alt={s.title.replace('\n', ' ')}
+                className="h-full w-full object-cover"
+                loading={i < 2 ? 'eager' : 'lazy'}
+                decoding="async"
+                draggable={false}
+              />
             </div>
+          ))}
+          {/* gradient overlay: left fade for text readability + subtle top/bottom vignette */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/85 via-[42%] to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/60 via-transparent to-[#0a0a0a]/40" />
+        </div>
+
+        {/* ───── left: text panel ───── */}
+        <div className="relative z-10 flex w-full flex-col justify-center px-6 sm:px-10 lg:w-[48%] lg:px-16 xl:px-24">
+          <h3 className="mb-6 text-sm font-semibold uppercase tracking-[0.15em] text-white/60">Our Services</h3>
+          <div className="relative min-h-[280px] sm:min-h-[320px]">
+            {services.map((s, i) => (
+              <div
+                key={i}
+                className={`svc-text ${i > 0 ? 'absolute inset-0' : ''}`}
+              >
+                <span className="mb-6 inline-block rounded-full border border-white px-4 py-1.5 text-[15px] font-semibold tracking-wide text-white">
+                  {s.tag}
+                </span>
+
+                <h2 className="mb-5 whitespace-pre-line text-[clamp(2rem,4.5vw,3.6rem)] font-bold leading-[1.1] tracking-[-0.025em] text-white">
+                  {s.title}
+                </h2>
+
+                <p className="max-w-[420px] text-[clamp(0.88rem,1.08vw,1.06rem)] leading-[1.8] text-white/80">
+                  {s.description}
+                </p>
+              </div>
+            ))}
           </div>
-        ))}
+
+          {/* progress bars */}
+          <div className="mt-12 flex flex-col gap-2">
+            {services.map((_, i) => (
+              <div
+                key={i}
+                className="svc-bar h-[2.5px] w-[36px] origin-left rounded-full bg-white"
+              />
+            ))}
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
   )
 }
 

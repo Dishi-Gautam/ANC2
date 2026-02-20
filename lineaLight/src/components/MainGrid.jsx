@@ -1,12 +1,8 @@
 import { useEffect, useRef, useContext } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { PreviewContext } from './PreviewContext'
 import pic1 from '../assets/pic1.jpg'
 import pic2 from '../assets/pic2.jpg'
 import pic3 from '../assets/pic3.jpg'
-
-gsap.registerPlugin(ScrollTrigger)
 
 const gridItems = [
   { label: 'Indoor', image: pic1 },
@@ -24,7 +20,9 @@ function MainGrid() {
   useEffect(() => {
     const grid = gridRef.current
     if (!grid) return
+    // enable hover effects on all pointer types (kept rAF throttling for performance)
     const items = grid.querySelectorAll('.grid-item')
+    const frameByItem = new WeakMap()
 
     const onEnter = (e) => {
       const item = e.currentTarget
@@ -39,17 +37,27 @@ function MainGrid() {
     }
     const onMove = (e) => {
       const item = e.currentTarget
-      const rect = item.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
-      const cx = rect.width / 2
-      const cy = rect.height / 2
-      const rotateY = ((x - cx) / cx) * 6
-      const rotateX = ((cy - y) / cy) * 4
-      item.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`
+      const existingFrame = frameByItem.get(item)
+      if (existingFrame) cancelAnimationFrame(existingFrame)
+
+      const frame = requestAnimationFrame(() => {
+        const rect = item.getBoundingClientRect()
+        const x = e.clientX - rect.left
+        const y = e.clientY - rect.top
+        const cx = rect.width / 2
+        const cy = rect.height / 2
+        const rotateY = ((x - cx) / cx) * 6
+        const rotateX = ((cy - y) / cy) * 4
+        item.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`
+      })
+
+      frameByItem.set(item, frame)
     }
     const onLeave = (e) => {
       const item = e.currentTarget
+      const frame = frameByItem.get(item)
+      if (frame) cancelAnimationFrame(frame)
+      frameByItem.delete(item)
       item.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
       item.style.boxShadow = ''
       item.style.zIndex = ''
@@ -62,53 +70,79 @@ function MainGrid() {
     }
 
     items.forEach((item) => {
-      item.addEventListener('mouseenter', onEnter)
-      item.addEventListener('mousemove', onMove)
-      item.addEventListener('mouseleave', onLeave)
+      item.addEventListener('pointerenter', onEnter)
+      item.addEventListener('pointermove', onMove)
+      item.addEventListener('pointerleave', onLeave)
     })
 
     return () => {
       items.forEach((item) => {
-        item.removeEventListener('mouseenter', onEnter)
-        item.removeEventListener('mousemove', onMove)
-        item.removeEventListener('mouseleave', onLeave)
+        const frame = frameByItem.get(item)
+        if (frame) cancelAnimationFrame(frame)
+        item.removeEventListener('pointerenter', onEnter)
+        item.removeEventListener('pointermove', onMove)
+        item.removeEventListener('pointerleave', onLeave)
       })
     }
   }, [])
 
   useEffect(() => {
-    const gridItemElements = gridRef.current.querySelectorAll('.grid-item')
+    const grid = gridRef.current
+    if (!grid) return
 
-    gridItemElements.forEach((item) => {
-      const img = item.querySelector('.grid-image')
+    let ctx
+    ;(async () => {
+      try {
+        const gsapModule = await import('gsap')
+        const ScrollTriggerModule = await import('gsap/ScrollTrigger')
+        const gsap = gsapModule.gsap || gsapModule.default || gsapModule
+        const ScrollTrigger = ScrollTriggerModule.ScrollTrigger || ScrollTriggerModule.default || ScrollTriggerModule
+        gsap.registerPlugin(ScrollTrigger)
 
-      gsap.fromTo(item,
-        { opacity: 0, y: 60, scale: 0.95 },
-        {
-          opacity: 1, y: 0, scale: 1,
-          duration: 0.8, ease: 'power3.out',
-          scrollTrigger: {
-            trigger: item,
-            start: 'top 85%',
-            end: 'top 40%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      )
+        ctx = gsap.context(() => {
+          const gridItemElements = grid.querySelectorAll('.grid-item')
 
-      gsap.to(img, {
-        yPercent: -10,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: item,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1.5,
-        },
-      })
-    })
+          gridItemElements.forEach((item) => {
+            const img = item.querySelector('.grid-image')
 
-    return () => ScrollTrigger.getAll().forEach((t) => t.kill())
+            gsap.fromTo(
+              item,
+              { opacity: 0, y: 60, scale: 0.95 },
+              {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: 0.8,
+                ease: 'power3.out',
+                scrollTrigger: {
+                  trigger: item,
+                  start: 'top 85%',
+                  end: 'top 40%',
+                  toggleActions: 'play none none reverse',
+                },
+              },
+            )
+
+            gsap.to(img, {
+              yPercent: -10,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: item,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 1.5,
+              },
+            })
+          })
+        }, grid)
+      } catch (err) {
+        // GSAP failed to load — ignore to avoid breaking the page
+      }
+    })()
+
+    return () => {
+      if (ctx) ctx.revert()
+    }
   }, [])
 
   return (

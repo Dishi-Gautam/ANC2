@@ -6,7 +6,6 @@ import pic1 from '../assets/pic1.jpg'
 import pic2 from '../assets/pic2.jpg'
 import pic3 from '../assets/pic3.jpg'
 
-gsap.registerPlugin(ScrollTrigger)
 
 const catalogues = [
   { type: 'Catalogue', title: 'MAESTRO', subtitle: 'quattro.1', image: pic1 },
@@ -23,18 +22,29 @@ function SwipeSection() {
   const { openPreview } = useContext(PreviewContext)
 
   useEffect(() => {
-    const cards = sectionRef.current.querySelectorAll('.card')
+    const section = sectionRef.current
+    if (!section) return
+    // enable hover effects on all pointer types (kept rAF throttling for performance)
+    const cards = section.querySelectorAll('.card')
+    const frameByCard = new WeakMap()
 
     const onMove = (e) => {
       const card = e.currentTarget
-      const rect = card.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
-      const cx = rect.width / 2
-      const cy = rect.height / 2
-      const rotateY = ((x - cx) / cx) * 8
-      const rotateX = ((cy - y) / cy) * 6
-      card.style.transform = `perspective(700px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`
+      const existingFrame = frameByCard.get(card)
+      if (existingFrame) cancelAnimationFrame(existingFrame)
+
+      const frame = requestAnimationFrame(() => {
+        const rect = card.getBoundingClientRect()
+        const x = e.clientX - rect.left
+        const y = e.clientY - rect.top
+        const cx = rect.width / 2
+        const cy = rect.height / 2
+        const rotateY = ((x - cx) / cx) * 8
+        const rotateX = ((cy - y) / cy) * 6
+        card.style.transform = `perspective(700px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`
+      })
+
+      frameByCard.set(card, frame)
     }
     const onEnter = (e) => {
       const card = e.currentTarget
@@ -47,6 +57,9 @@ function SwipeSection() {
     }
     const onLeave = (e) => {
       const card = e.currentTarget
+      const frame = frameByCard.get(card)
+      if (frame) cancelAnimationFrame(frame)
+      frameByCard.delete(card)
       card.style.transform = 'perspective(700px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
       card.style.boxShadow = ''
       card.style.zIndex = ''
@@ -57,60 +70,67 @@ function SwipeSection() {
     }
 
     cards.forEach((card) => {
-      card.addEventListener('mouseenter', onEnter)
-      card.addEventListener('mousemove', onMove)
-      card.addEventListener('mouseleave', onLeave)
+      card.addEventListener('pointerenter', onEnter)
+      card.addEventListener('pointermove', onMove)
+      card.addEventListener('pointerleave', onLeave)
     })
 
     return () => {
       cards.forEach((card) => {
-        card.removeEventListener('mouseenter', onEnter)
-        card.removeEventListener('mousemove', onMove)
-        card.removeEventListener('mouseleave', onLeave)
+        const frame = frameByCard.get(card)
+        if (frame) cancelAnimationFrame(frame)
+        card.removeEventListener('pointerenter', onEnter)
+        card.removeEventListener('pointermove', onMove)
+        card.removeEventListener('pointerleave', onLeave)
       })
     }
   }, [])
 
   useEffect(() => {
-    const cards = sectionRef.current.querySelectorAll('.card')
-    
-    cards.forEach((card) => {
-      const cardImage = card.querySelector('.card-image')
-      
-      gsap.fromTo(card,
-        {
-          opacity: 0,
-          x: 50,
-          rotationY: 15
-        },
-        {
-          opacity: 1,
-          x: 0,
-          rotationY: 0,
-          duration: 0.8,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: card,
-            start: 'left 90%',
-            toggleActions: 'play none none reverse'
-          }
-        }
-      )
+    const section = sectionRef.current
+    if (!section) return
 
-      gsap.to(cardImage, {
-        scale: 1.15,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1.5
-        }
+    const ctx = gsap.context(() => {
+      const cards = section.querySelectorAll('.card')
+
+      cards.forEach((card) => {
+        const cardImage = card.querySelector('.card-image')
+
+        gsap.fromTo(card,
+          {
+            opacity: 0,
+            x: 50,
+            rotationY: 15
+          },
+          {
+            opacity: 1,
+            x: 0,
+            rotationY: 0,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: card,
+              start: 'left 90%',
+              toggleActions: 'play none none reverse'
+            }
+          }
+        )
+
+        gsap.to(cardImage, {
+          scale: 1.15,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 1.5
+          }
+        })
       })
-    })
+    }, section)
 
     return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+      ctx.revert()
     }
   }, [])
 
@@ -154,9 +174,13 @@ function SwipeSection() {
               className="card relative flex h-[380px] flex-col overflow-hidden rounded-2xl text-white [transform:perspective(700px)_rotateX(0deg)_rotateY(0deg)_scale3d(1,1,1)] [transform-style:preserve-3d] transition-[transform,box-shadow] duration-500 [transition-timing-function:cubic-bezier(0.23,1,0.32,1)] lg:h-[420px]"
               onClick={() => openPreview(item.image, item.title)}
             >
-              <div 
-                className="card-image absolute inset-0 bg-cover bg-center [transform:translateZ(0)] transition-transform duration-500"
-                style={{ backgroundImage: `url(${item.image})` }}
+              <img
+                src={item.image}
+                alt={item.title}
+                className="card-image pointer-events-none absolute inset-0 h-full w-full object-cover object-center [transform:translateZ(0)] transition-transform duration-500"
+                loading="lazy"
+                decoding="async"
+                draggable={false}
               />
               <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/40 via-black/20 to-black/70" />
               <div className="card-shine pointer-events-none absolute inset-0 z-[2] bg-[linear-gradient(125deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.08)_40%,rgba(255,255,255,0)_60%)] opacity-0 transition-opacity duration-300" />

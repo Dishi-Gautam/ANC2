@@ -20,34 +20,52 @@ function RadiatingLines() {
 	const canvasRef = useRef(null)
 	const raf = useRef(null)
 	const time = useRef(0)
+	const lastFrameTime = useRef(0)
+	const disableAnimation = useRef(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 
 	const resize = useCallback(() => {
 		const c = canvasRef.current
 		if (!c) return
-		c.width = c.offsetWidth * devicePixelRatio
-		c.height = c.offsetHeight * devicePixelRatio
+		const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
+		const width = c.offsetWidth
+		const height = c.offsetHeight
+		c.width = Math.max(1, Math.floor(width * dpr))
+		c.height = Math.max(1, Math.floor(height * dpr))
+		const ctx = c.getContext('2d')
+		ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 	}, [])
 
 	useEffect(() => {
+		if (disableAnimation.current) return
 		const c = canvasRef.current
 		if (!c) return
 		const ctx = c.getContext('2d')
 		resize()
 		window.addEventListener('resize', resize)
 
-		const draw = () => {
+		const draw = (timestamp) => {
+			if (document.hidden) {
+				raf.current = requestAnimationFrame(draw)
+				return
+			}
+
+			if (timestamp - lastFrameTime.current < 33) {
+				raf.current = requestAnimationFrame(draw)
+				return
+			}
+			lastFrameTime.current = timestamp
+
 			time.current += 0.0015
-			const w = c.width
-			const h = c.height
-			const dpr = devicePixelRatio
+			const w = c.offsetWidth
+			const h = c.offsetHeight
 			ctx.clearRect(0, 0, w, h)
 
 			const cx = w / 2
 			const cy = h * 0.48
-			const lineCount = 110
+			const lineCount = Math.min(90, Math.max(48, Math.floor(w / 16)))
 			const maxLen = Math.max(w, h) * 1.2
 
-			ctx.shadowBlur = 6 * dpr
+			ctx.shadowBlur = 6
 			ctx.shadowColor = 'rgba(170,160,255,0.06)'
 
 			for (let i = 0; i < lineCount; i++) {
@@ -61,7 +79,7 @@ function RadiatingLines() {
 				ctx.moveTo(cx, cy)
 				ctx.lineTo(x2, y2)
 				ctx.strokeStyle = `rgba(255,255,255,${0.06 + Math.sin(time.current * 1.5 + i) * 0.02})`
-				ctx.lineWidth = 1.2 * dpr
+				ctx.lineWidth = 1.2
 				ctx.stroke()
 			}
 			raf.current = requestAnimationFrame(draw)
@@ -81,12 +99,16 @@ function ParticleCanvas() {
 	const particles = useRef([])
 	const raf = useRef(null)
 	const mouse = useRef({ x: -9999, y: -9999 })
+	const disableAnimation = useRef(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+	const dprRef = useRef(1)
 
 	const init = useCallback((canvas) => {
-		const count = Math.min(50, Math.floor((canvas.width * canvas.height) / 20000))
+		const width = canvas.offsetWidth
+		const height = canvas.offsetHeight
+		const count = Math.min(36, Math.max(14, Math.floor((width * height) / 32000)))
 		particles.current = Array.from({ length: count }, () => ({
-			x: Math.random() * canvas.width,
-			y: Math.random() * canvas.height,
+			x: Math.random() * width,
+			y: Math.random() * height,
 			r: Math.random() * 1.2 + 0.3,
 			dx: (Math.random() - 0.5) * 0.15,
 			dy: (Math.random() - 0.5) * 0.15,
@@ -95,14 +117,16 @@ function ParticleCanvas() {
 	}, [])
 
 	useEffect(() => {
+		if (disableAnimation.current) return
 		const canvas = canvasRef.current
 		if (!canvas) return
 		const ctx = canvas.getContext('2d')
 
 		const resizeFn = () => {
-			canvas.width = canvas.offsetWidth * devicePixelRatio
-			canvas.height = canvas.offsetHeight * devicePixelRatio
-			ctx.scale(devicePixelRatio, devicePixelRatio)
+			dprRef.current = Math.min(window.devicePixelRatio || 1, 1.5)
+			canvas.width = Math.max(1, Math.floor(canvas.offsetWidth * dprRef.current))
+			canvas.height = Math.max(1, Math.floor(canvas.offsetHeight * dprRef.current))
+			ctx.setTransform(dprRef.current, 0, 0, dprRef.current, 0, 0)
 			init(canvas)
 		}
 		resizeFn()
@@ -115,6 +139,10 @@ function ParticleCanvas() {
 		canvas.addEventListener('pointermove', onMove)
 
 		const draw = () => {
+			if (document.hidden) {
+				raf.current = requestAnimationFrame(draw)
+				return
+			}
 			const w = canvas.offsetWidth
 			const h = canvas.offsetHeight
 			ctx.clearRect(0, 0, w, h)
@@ -122,8 +150,9 @@ function ParticleCanvas() {
 			particles.current.forEach((p) => {
 				const mdx = p.x - mouse.current.x
 				const mdy = p.y - mouse.current.y
-				const dist = Math.sqrt(mdx * mdx + mdy * mdy)
-				if (dist < 100) {
+				const distSq = mdx * mdx + mdy * mdy
+				if (distSq < 10000 && distSq > 0.0001) {
+					const dist = Math.sqrt(distSq)
 					const force = ((100 - dist) / 100) * 0.4
 					p.x += (mdx / dist) * force
 					p.y += (mdy / dist) * force

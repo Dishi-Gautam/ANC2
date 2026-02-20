@@ -1,58 +1,71 @@
-import { FaInstagram, FaFacebookF, FaTwitter, FaLinkedinIn, FaYoutube, FaPinterestP, FaSpotify } from 'react-icons/fa'
+import { FaInstagram, FaFacebookF, FaLinkedinIn, FaYoutube, FaPinterestP, FaSpotify } from 'react-icons/fa'
+import { FaXTwitter } from 'react-icons/fa6'
 
 const socialLinks = [
   { name: 'Instagram', icon: <FaInstagram /> },
   { name: 'Facebook', icon: <FaFacebookF /> },
-  { name: 'Twitter', icon: <FaTwitter /> },
+  { name: 'Twitter', icon: <FaXTwitter /> },
   { name: 'Linkedin', icon: <FaLinkedinIn /> },
   { name: 'Youtube', icon: <FaYoutube /> },
   { name: 'Pinterest', icon: <FaPinterestP /> },
   { name: 'Spotify', icon: <FaSpotify /> },
 ]
 
-const footerData = {
-  contacts: {
+const footerColumns = [
+  {
     title: 'Contacts',
-    links: ['Sales Network', 'Press Contacts', 'Contacts']
+    links: ['Sales Network', 'Press Contacts', 'Contacts'],
   },
-  resources: {
+  {
     title: 'Resources',
-    links: ['Catalogues', 'Projects', 'Outdoor', 'Indoor']
+    links: ['Catalogues', 'Projects', 'Outdoor', 'Indoor'],
   },
-  company: {
+  {
     title: 'Linea Light Group',
-    links: ['Work with us', 'News', 'Events']
+    links: ['Work with us', 'News', 'Events'],
   },
-  helpful: {
+  {
     title: 'Helpful',
-    links: ['Research & development', 'Warranty', 'Newsletter', 'Plugin', 'Certificates']
-  }
-}
+    links: ['Research & development', 'Warranty', 'Newsletter', 'Plugin', 'Certificates'],
+  },
+]
+
+const bottomLinks = ['Credits', 'Workspace', 'Privacy Policy', 'Cookie Policy', 'Whistleblowing']
 
 function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-black px-4 pb-8 pt-14 text-white sm:px-6 lg:px-10">
-      <div className="mx-auto mb-10 max-w-7xl rounded-3xl border border-white/10 bg-zinc-950/70 p-8 text-center backdrop-blur-xl">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center">
-          <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
-            <circle cx="28" cy="28" r="26" stroke="white" strokeWidth="2"/>
-            <path d="M28 6C15 6 6 15 6 28C6 41 15 50 28 50V6Z" fill="white"/>
+    <footer className="bg-[#060606] text-white">
+      {/* ── newsletter ── */}
+      <div className="border-b border-white/[0.07] px-6 py-16 text-center lg:px-10">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center">
+          <svg width="48" height="48" viewBox="0 0 56 56" fill="none">
+            <circle cx="28" cy="28" r="26" stroke="white" strokeWidth="1.5" />
+            <path d="M28 6C15 6 6 15 6 28C6 41 15 50 28 50V6Z" fill="white" />
           </svg>
         </div>
-        <h2 className="mb-2 text-2xl font-semibold sm:text-3xl">Subscribe to our newsletter</h2>
-        <p className="mb-5 text-sm text-white/70 sm:text-base">New products and latest trends from lighting.</p>
-        <button className="rounded-lg border border-white/20 bg-white px-5 py-2 text-sm font-semibold text-black transition hover:bg-white/90">
+        <h2 className="mt-5 text-[clamp(1.4rem,2.2vw,1.9rem)] font-semibold tracking-[-0.01em]">
+          Subscribe to our newsletter
+        </h2>
+        <p className="mt-2 text-sm text-white/50 sm:text-[15px]">
+          New products and latest trends from lighting.
+        </p>
+        <button className="mt-6 rounded-lg border border-white/20 bg-white px-7 py-2.5 text-sm font-semibold text-black transition-colors duration-200 hover:bg-white/90">
           Subscribe
         </button>
       </div>
 
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 border-b border-white/10 pb-10 md:grid-cols-2 xl:grid-cols-5">
+      {/* ── links grid ── */}
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-6 gap-y-10 px-6 py-14 sm:grid-cols-3 lg:grid-cols-5 lg:px-10">
+        {/* social column */}
         <div>
-          <ul className="space-y-2">
-            {socialLinks.map((item, index) => (
-              <li key={index}>
-                <a href="#" className="inline-flex items-center gap-2 text-sm text-white/75 transition hover:text-white">
-                  <span className="text-white/85">{item.icon}</span>
+          <ul className="space-y-3">
+            {socialLinks.map((item, i) => (
+              <li key={i}>
+                <a
+                  href="#"
+                  className="inline-flex items-center gap-2.5 text-[13px] text-white/60 transition-colors duration-200 hover:text-white"
+                >
+                  <span className="text-[15px] text-white/70">{item.icon}</span>
                   {item.name}
                 </a>
               </li>
@@ -60,57 +73,58 @@ function Footer() {
           </ul>
         </div>
 
-        <div>
-          <h4 className="mb-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">{footerData.contacts.title}</h4>
-          <ul className="space-y-2">
-            {footerData.contacts.links.map((link, index) => (
-              <li key={index}><a href="#" className="text-sm text-white/70 transition hover:text-white">{link}</a></li>
-            ))}
-          </ul>
-        </div>
+        {/* data columns */}
+        {footerColumns.map((col, ci) => (
+          <div key={ci}>
+            <h4 className="mb-4 text-[13px] font-semibold uppercase tracking-[0.1em] text-white">
+              {col.title}
+            </h4>
+            <ul className="space-y-2.5">
+              {col.links.map((link, li) => (
+                <li key={li}>
+                  <a
+                    href="#"
+                    className="text-[13px] text-white/55 transition-colors duration-200 hover:text-white"
+                  >
+                    {link}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
 
-        <div>
-          <h4 className="mb-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">{footerData.resources.title}</h4>
-          <ul className="space-y-2">
-            {footerData.resources.links.map((link, index) => (
-              <li key={index}><a href="#" className="text-sm text-white/70 transition hover:text-white">{link}</a></li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="mb-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">{footerData.company.title}</h4>
-          <ul className="space-y-2">
-            {footerData.company.links.map((link, index) => (
-              <li key={index}><a href="#" className="text-sm text-white/70 transition hover:text-white">{link}</a></li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="mb-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">{footerData.helpful.title}</h4>
-          <ul className="space-y-2">
-            {footerData.helpful.links.map((link, index) => (
-              <li key={index}><a href="#" className="text-sm text-white/70 transition hover:text-white">{link}</a></li>
-            ))}
-          </ul>
+      {/* ── partner logos ── */}
+      <div className="border-t border-white/[0.07]">
+        <div className="mx-auto flex max-w-7xl items-center justify-center gap-10 px-6 py-8 lg:px-10">
+          <span className="text-[13px] uppercase tracking-[0.18em] text-white/30">STYLEPARK</span>
+          <span className="text-[13px] tracking-[0.04em] text-white/30">archiproducts</span>
+          <span className="text-[15px] font-semibold tracking-[0.01em] text-white/30">
+            Archi<span className="text-[11px] align-super">EXPO</span>
+          </span>
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-4 py-6 text-sm uppercase tracking-[0.08em] text-white/45">
-        <span>STYLEPARK</span>
-        <span>archiproducts</span>
-        <span>Archi<sub>EXPO</sub></span>
-      </div>
-
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 border-t border-white/10 pt-5 md:flex-row md:items-center md:justify-between">
-        <p className="max-w-4xl text-xs leading-6 text-white/45">LINEA LIGHT S.R.L. A SOCIO UNICO © 2024 - Company subject to management and coordination by Minulamp S.r.l. Cap. Soc. € 1.000.000 i.v. - R.I. TV/ C.F e P.IVA 01220530263</p>
-        <div className="flex flex-wrap gap-4 text-xs text-white/65">
-          <a href="#" className="transition hover:text-white">Credits</a>
-          <a href="#" className="transition hover:text-white">Workspace</a>
-          <a href="#" className="transition hover:text-white">Privacy Policy</a>
-          <a href="#" className="transition hover:text-white">Cookie Policy</a>
-          <a href="#" className="transition hover:text-white">Whistleblowing</a>
+      {/* ── legal / bottom row ── */}
+      <div className="border-t border-white/[0.07]">
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-6 py-6 text-center lg:px-10">
+          <p className="max-w-5xl text-[11px] leading-relaxed text-white/35">
+            LINEA LIGHT S.R.L. A SOCIO UNICO © 2024 – Company subject to management and
+            coordination by Minulamp S.r.l. Cap. Soc. € 1.000.000 i.v. – R.I. TV/ C.F e P.IVA
+            01220530263
+          </p>
+          <div className="flex flex-wrap justify-center gap-5">
+            {bottomLinks.map((link, i) => (
+              <a
+                key={i}
+                href="#"
+                className="text-[11px] text-white/50 transition-colors duration-200 hover:text-white"
+              >
+                {link}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </footer>
